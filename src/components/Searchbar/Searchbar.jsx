@@ -3,7 +3,7 @@ import propTypes from 'prop-types';
 import { SearchForm, SearchHeader } from './Searchbar.styled';
 
 export class Searchbar extends Component {
-  enterSearchData = event => {
+  inputSearchData = event => {
     event.preventDefault();
 
     const searchData = event.currentTarget.elements.searchInput.value;
@@ -15,7 +15,7 @@ export class Searchbar extends Component {
   render() {
     return (
       <SearchHeader>
-        <SearchForm onSubmit={this.enterSearchData}>
+        <SearchForm onSubmit={this.inputSearchData}>
           <button type="submit">
             <img
               src={require('../../images/icons8-search-50.png')}
