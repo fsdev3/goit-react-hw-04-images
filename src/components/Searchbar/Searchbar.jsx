@@ -7,7 +7,7 @@ export const Searchbar = ({ submitHandler }) => {
   const inputSearchData = e => {
     e.preventDefault();
 
-    const searchInput = e.currentTarget.elements.searchInput.value;
+    // const searchInput = e.currentTarget.elements.searchInput.value; // delete!?
     submitHandler(searchInput);
     setSearchInput('');
   };
