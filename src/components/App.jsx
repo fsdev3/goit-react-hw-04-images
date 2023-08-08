@@ -76,7 +76,7 @@ export class App extends Component {
       <div>
         {this.state.isModal && (
           <Modal
-            eventFunction={this.closeModal}
+            eventHandler={this.closeModal}
             imageLink={this.state.modalImageLink}
           />
         )}

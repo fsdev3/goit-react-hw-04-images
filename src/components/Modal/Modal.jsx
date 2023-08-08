@@ -13,13 +13,13 @@ export class Modal extends Component {
 
   handleKeyDown = event => {
     if (event.key === 'Escape') {
-      this.props.eventFunction();
+      this.props.eventHandler();
     }
   };
 
   handleClick = event => {
     if (event.target === event.currentTarget) {
-      this.props.eventFunction();
+      this.props.eventHandler();
     }
   };
 
@@ -35,6 +35,6 @@ export class Modal extends Component {
 }
 
 Modal.propTypes = {
-  eventFunction: propTypes.func.isRequired,
+  eventHandler: propTypes.func.isRequired,
   imageLink: propTypes.string.isRequired,
 };
