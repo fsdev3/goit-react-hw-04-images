@@ -80,7 +80,7 @@ export class App extends Component {
             imageLink={this.state.modalImageLink}
           />
         )}
-        <Searchbar submitFunction={this.getSearchResults} />
+        <Searchbar submitHandler={this.getSearchResults} />
         {this.state.isLoading && <Loader />}
         <ImageGallery
           imageGalleryItems={this.state.images}
