@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import Notiflix from 'notiflix';
 import { Searchbar } from './Searchbar/Searchbar';
 import { Modal } from './Modal/Modal';
@@ -7,87 +7,77 @@ import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
 import { fetchImages } from '../services/fetchImages';
 
-export class App extends Component {
-  state = {
-    images: [],
-    isLoading: false,
-    searchResult: '',
-    page: 1,
-    totalHits: 0,
-    isLoadMore: false,
-    isModal: false,
-    modalImageLink: '',
+export const App = () => {
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchResult, setSearchResult] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalHits, setTotalHits] = useState(0);
+  const [isLoadMore, setIsLoadMore] = useState(false);
+  const [isModal, setIsModal] = useState(false);
+  const [modalImageLink, setModalImageLink] = useState('');
+
+  const getSearchResults = searchResultData => {
+    setIsLoadMore(false);
+    setImages([]);
+    setSearchResult(searchResultData);
+    setPage(1);
   };
 
-  getSearchResults = searchResultData => {
-    this.setState({
-      isLoadMore: false,
-      images: [],
-      searchResult: searchResultData,
-      page: 1,
-    });
-  };
+  useEffect(() => {
+    const fetchImageData = async () => {
+      if (!searchResult) return;
+      setIsLoading(true);
 
-  async componentDidUpdate(prevProps, prevState) {
-    const { searchResult, page } = this.state;
-    if (page !== prevState.page || searchResult !== prevState.searchResult) {
-      this.setState({ isLoading: true });
       try {
         const imagesData = await fetchImages(searchResult, page);
         if (imagesData.length === 0) {
           throw new Error('Sorry, no results...');
         }
+
         const isLoadMore = page < Math.ceil(imagesData.totalHits / 12);
-        this.setState(prev => ({
-          images: [...prev.images, ...imagesData.hits],
-          isLoadMore: isLoadMore,
-          totalHits: imagesData.totalHits,
-        }));
+        setImages(prevImages => [...prevImages, ...imagesData.hits]);
+        setIsLoadMore(isLoadMore);
+        setTotalHits(imagesData.totalHits);
+
         if (!isLoadMore) {
           Notiflix.Notify.warning(
             'We are sorry, but you have reached the end of search results.'
           );
         }
       } catch (error) {
-        this.setState({ isLoadMore: false, error });
+        setIsLoadMore(false);
+        console.error(error);
       } finally {
-        this.setState({ isLoading: false });
+        setIsLoading(false);
       }
-    }
-  }
+    };
 
-  openModal = largeImageLink => {
-    this.setState({
-      isModal: true,
-      modalImageLink: largeImageLink,
-    });
+    fetchImageData();
+  }, [searchResult, page]);
+
+  const openModal = largeImageLink => {
+    setIsModal(true);
+    setModalImageLink(largeImageLink);
   };
 
-  closeModal = () => {
-    this.setState({ isModal: false });
+  const closeModal = () => {
+    setIsModal(false);
   };
 
-  loadMoreFunction = () => {
-    this.setState(state => ({ page: state.page + 1 }));
+  const loadMoreFunction = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  render() {
-    return (
-      <div>
-        {this.state.isModal && (
-          <Modal
-            eventHandler={this.closeModal}
-            imageLink={this.state.modalImageLink}
-          />
-        )}
-        <Searchbar submitHandler={this.getSearchResults} />
-        {this.state.isLoading && <Loader />}
-        <ImageGallery
-          imageGalleryItems={this.state.images}
-          itemOnClick={this.openModal}
-        />
-        {this.state.isLoadMore && <Button onClick={this.loadMoreFunction} />}
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      {isModal && (
+        <Modal eventHandler={closeModal} imageLink={modalImageLink} />
+      )}
+      <Searchbar submitHandler={getSearchResults} />
+      {isLoading && <Loader />}
+      <ImageGallery imageGalleryItems={images} itemOnClick={openModal} />
+      {isLoadMore && <Button onClick={loadMoreFunction} />}
+    </div>
+  );
+};
