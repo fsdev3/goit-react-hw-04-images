@@ -6,8 +6,6 @@ export const Searchbar = ({ submitHandler }) => {
   const [searchInput, setSearchInput] = useState('');
   const inputSearchData = e => {
     e.preventDefault();
-
-    // const searchInput = e.currentTarget.elements.searchInput.value; // delete!?
     submitHandler(searchInput);
     setSearchInput('');
   };
